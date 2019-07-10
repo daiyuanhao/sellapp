@@ -30,7 +30,7 @@
 				<ul>
 					<li v-for="(rating,index) in ratings" v-show="needShow(rating.rateType, rating.text)" class="rating-item" :key="index">
 						<div class="avater">
-							<img width="28" height="28" :src="rating.avater" />
+							<img width="28" height="28" :src="rating.avatar" />
 						</div>
 						<div class="content">
 							<h1 class="name">{{rating.username}}</h1>

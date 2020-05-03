@@ -18,7 +18,7 @@
 						<span class="now">￥{{food.price}}</span><span class="old" v-show="food.oldPrice">￥{{food.oldPrice}}</span>
 					</div>
 					<div class="cartcontrol-wrapper">
-						<cartcontrol :food="food"></cartcontrol>
+						<cartcontrol :food="food" @cart-add='addFood'></cartcontrol>
 					</div>
 					<transition name="fade">
 						<div class="buy" v-show="!food.count ||food.count===0" @click.stop.prevent="addFirst">加入购物车</div>
@@ -55,94 +55,97 @@
 </template>
 
 <script>
-	import BScroll from 'better-scroll';
-	import Vue from 'vue';
-	import {formatDate} from '../../common/js/date.js';
-	import cartcontrol from '../cartcontrol/cartcontrol.vue';
-	import split from '../split/split.vue';
-	import ratingselect from '../ratingselect/ratingselect.vue';
-	
-	// const POSITIVE = 0;
-	// const NEGATIVE = 1;
-	const ALL = 2;
-	
-	export default {
-		props: {
-			food: {
-				type: Object
-			}
-		},
-		data() {
-			return {
-				showFlag: false,
-				selectType: ALL,
-				onlyContent: true,
-				desc: {
-					all: '全部',
-					positive: '推荐',
-					negative: '吐槽'
-					}
-			}
-		},
-		methods: {
-			show() {
-				this.showFlag = true;
-				this.selectType = ALL;
-				this.onlyContent = true;//默认查看：true只看有内容的评价，false查看所有
-				this.$nextTick(() => {
-					if(!this.scroll){
-						this.scroll = new BScroll(this.$refs.food, {
-							click: true
-						});
-					} else {
-						this.scroll.refresh();
-					}
-				})
-			},
-			hide() {
-				this.showFlag = false;
-			},
-			addFirst(event) {
-				if(!event._constructed) {
-					return;
-				}
-				this.$emit('cart-add', event.target);
-				Vue.set(this.food,'count', 1 );
-			},
-			needShow(type, text) {
-				if (this.onlyContent && !text) {
-					return false;
-				}
-				if (this.selectType === ALL) {
-					return true;
-				} else {
-					return type === this.selectType;
-				}
-			},
-			incrementTotal(type,data) {
-				this[type] = data;
-				this.$nextTick(() => {
-					this.scroll.refresh();
-				})
-			}
-		},
-		filters: {
-			formatDate(time) {
-				let date = new Date(time);
-				return formatDate(date, 'yyyy-MM-dd hh:mm');
-			}
-		},
-		components: {
-				cartcontrol,
-				split,
-				ratingselect
-			}
-	};
+import BScroll from 'better-scroll'
+import Vue from 'vue'
+import {formatDate} from '../../common/js/date.js'
+import cartcontrol from '../cartcontrol/cartcontrol.vue'
+import split from '../split/split.vue'
+import ratingselect from '../ratingselect/ratingselect.vue'
+
+// const POSITIVE = 0;
+// const NEGATIVE = 1;
+const ALL = 2
+
+export default {
+  props: {
+    food: {
+      type: Object
+    }
+  },
+  data () {
+    return {
+      showFlag: false,
+      selectType: ALL,
+      onlyContent: true,
+      desc: {
+        all: '全部',
+        positive: '推荐',
+        negative: '吐槽'
+      }
+    }
+  },
+  methods: {
+    show () {
+      this.showFlag = true
+      this.selectType = ALL
+      this.onlyContent = true// 默认查看：true只看有内容的评价，false查看所有
+      this.$nextTick(() => {
+        if (!this.scroll) {
+          this.scroll = new BScroll(this.$refs.food, {
+            click: true
+          })
+        } else {
+          this.scroll.refresh()
+        }
+      })
+    },
+    hide () {
+      this.showFlag = false
+    },
+    addFood (target) {
+      this.$emit('cart-add', event.target)
+    },
+    addFirst (event) {
+      if (!event._constructed) {
+        return
+      }
+      this.$emit('cart-add', event.target)
+      Vue.set(this.food, 'count', 1)
+    },
+    needShow (type, text) {
+      if (this.onlyContent && !text) {
+        return false
+      }
+      if (this.selectType === ALL) {
+        return true
+      } else {
+        return type === this.selectType
+      }
+    },
+    incrementTotal (type, data) {
+      this[type] = data
+      this.$nextTick(() => {
+        this.scroll.refresh()
+      })
+    }
+  },
+  filters: {
+    formatDate (time) {
+      let date = new Date(time)
+      return formatDate(date, 'yyyy-MM-dd hh:mm')
+    }
+  },
+  components: {
+    cartcontrol,
+    split,
+    ratingselect
+  }
+}
 </script>
 
 <style scoped lang="stylus">
 	@import "../../common/stylus/mixin.styl"
-	
+
 	.food
 		position fixed
 		left 0
